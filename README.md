@@ -42,3 +42,16 @@ Modbus Connector (four pins):
  * Copy template file `lib/settings.cpp.sample` as `lib/settings.cpp`
  * Edit according to your environment
  * `make upload`
+
+## OTA update
+
+To enable OTA update set OTA password (variable `otaPass` in `settings.cpp`) to non-empty
+string.
+
+To update image using PlatformIO `pio` tool:
+
+`PLATFORMIO_UPLOAD_FLAGS="--auth=ota-password" pio run -t upload --upload-port device.ip.address`
+
+Or with zeroconf address (`hostname` is your `wifiHostname` defined in `settings.cpp`):
+
+`PLATFORMIO_UPLOAD_FLAGS="--auth=ota-password" pio run -t upload --upload-port hostname.local`

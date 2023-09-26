@@ -24,3 +24,8 @@ const String signalKPathIp = "batteryX.ipaddr";
 
 // Time in milliseconds between 
 const int signalKBetweenDeltas = 3000;
+
+// Over the air (OTA) update password
+// Set password to enable OTA feature
+const char * otaPass = "";
+// const char * otaPass = "ota-password";

@@ -12,6 +12,7 @@
 */
 
 #include <Arduino.h>
+#include <ArduinoOTA.h>
 #include <ModbusRTU.h>         // https://github.com/emelianov/modbus-esp8266
 #include <SoftwareSerial.h>
 #include <EspSigK.h>
@@ -60,6 +61,38 @@ void ledError() {
   }
 }
 
+bool otaActive() {
+  return (strcmp(otaPass, (const char *)"") != 0);
+}
+
+void otaSetup(const char * hostname, const char * otaPassword) {
+  ArduinoOTA.setHostname(hostname);
+  ArduinoOTA.setPassword(otaPassword);
+  Serial.print("OTA password: ");
+  Serial.print(otaPassword);
+  Serial.print(" ");
+
+  ArduinoOTA.onStart([]() {
+    Serial.println("Staring OTA update...");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nOTA update done");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+
+  ArduinoOTA.begin();
+}
+
 bool modbusStatusCallback(Modbus::ResultCode event, uint16_t transactionId, void* data) {
   // Serial.printf_P("Request result: 0x%02X, Mem: %d\n", event, ESP.getFreeHeap());
 
@@ -95,6 +128,12 @@ void setup() {
   sigK.begin();
   Serial.println("OK");
 
+  if (otaActive()) {
+    Serial.print("Initialising OTA...");
+    otaSetup(wifiHostname.c_str(), otaPass);
+    Serial.println("OK");
+  }
+
   Serial.println("Setup finished");
   ledOff();
 }
@@ -103,6 +142,12 @@ uint16_t registers[2];
 float voltage;
 float current;
 String myIP;
+
+void sigKhandler() {
+  if (otaActive()) {
+    ArduinoOTA.handle();
+  }
+}
 
 void loop() {
   if (!modbus.slave()) {
@@ -133,7 +178,7 @@ void loop() {
   sigK.handle();
 
   ledOn();
-  sigK.safeDelay(signalKBetweenDeltas / 2);
+  sigK.safeDelay(signalKBetweenDeltas / 2, &sigKhandler);
   ledOff();
-  sigK.safeDelay(signalKBetweenDeltas / 2);
+  sigK.safeDelay(signalKBetweenDeltas / 2, &sigKhandler);
 }
