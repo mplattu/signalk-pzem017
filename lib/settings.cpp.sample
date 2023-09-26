@@ -1,0 +1,26 @@
+#include <Arduino.h>
+
+#define PZEM_MODBUS_ID 0x01
+#define PZEM_SHUNT PZEM_SHUNT_200A
+
+// Sensor hostname
+const String wifiHostname = "pzem017-1";
+
+// WiFi network name and password
+const String wifiSsid = "your-ssid";
+const String wifiPass = "your-network-password";
+
+// SignalK server IP and port
+// An empty string should find your server using zero conf
+const String signalKHostIP = "192.168.49.10";
+const uint16_t signalKHostPort = 3000;
+
+// SignalK data paths for current, voltage and sensor IP
+// The last can be used to find your sensor in case the zero conf
+// name service (hostname.local) does not work
+const String signalKPathCurrent = "electrical.batteries.batteryX.current";
+const String signalKPathVoltage = "electrical.batteries.batteryX.voltage";
+const String signalKPathIp = "batteryX.ipaddr";
+
+// Time in milliseconds between 
+const int signalKBetweenDeltas = 3000;

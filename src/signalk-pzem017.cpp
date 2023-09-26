@@ -32,17 +32,8 @@
 #define SERIAL_RX D8
 #define SERIAL_TX D7
 #define SERIAL_CONTROL D6
-#define PZEM_MODBUS_ID 0x01
-#define PZEM_SHUNT PZEM_SHUNT_200A
 
-const String wifiHostname = "pzem017-1";
-const String wifiSsid = "your-ssid";
-const String wifiPass = "your-network-password";
-const String signalKHost = "192.168.49.10";
-const String signalKPathCurrent = "electrical.batteries.batteryX.current";
-const String signalKPathVoltage = "electrical.batteries.batteryX.voltage";
-const String signalKPathIp = "batteryX.ipaddr";
-const int signalKBetweenDeltas = 3000;
+#include "../lib/settings.cpp"
 
 WiFiClient wiFiClient;
 EspSigK sigK(wifiHostname, wifiSsid, wifiPass, &wiFiClient);
@@ -97,7 +88,8 @@ void setup() {
   Serial.println("OK");
 
   Serial.print("Starting signalK client...");
-  sigK.setServerHost(signalKHost);
+  sigK.setServerHost(signalKHostIP);
+  sigK.setServerPort(signalKHostPort);
   sigK.setPrintDebugSerial(true);
   sigK.setWiFiConnectTimeout(20000);
   sigK.begin();

@@ -39,7 +39,6 @@ Modbus Connector (four pins):
 
 ## Configuration
 
- * See `src/signalk-pzem017.cpp`
- * Set `PZEM_SHUNT` according to your shunt value (line 36)
- * Set network and SignalK settings as needed (lines 38-45)
+ * Copy template file `lib/settings.cpp.sample` as `lib/settings.cpp`
+ * Edit according to your environment
  * `make upload`
